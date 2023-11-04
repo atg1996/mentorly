@@ -1,6 +1,7 @@
 const User = require('../models/userModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const validator = require('validator')
 
 const signUpUser = async(req, res) => {
 
@@ -20,6 +21,12 @@ const signUpUser = async(req, res) => {
 
 
     try {
+
+        if (!validator.isEmail(email)) {
+            return res.status(400).json({ message: 'Invalid email format' });
+        }
+
+
         const existingUser = await User.findOne({ $or: [{ login }, { email }] });
         if (existingUser) {
             return res.status(409).json({ message: 'User already exists' });
