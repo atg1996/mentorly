@@ -1,25 +1,8 @@
 const User = require('../models/userModel');
 const validator = require('validator');
 const bcrypt = require("bcryptjs");
+const{validFieldOptions} = require('../staticData/fields')
 
-const validFieldOptions = [
-    "Software Engineer",
-    "Web Developer",
-    "Data Scientist",
-    "Graphic Designer",
-    "Nurse",
-    "Accountant",
-    "Marketing Manager",
-    "Architect",
-    "Teacher",
-    "Lawyer",
-    "Electrician",
-    "Mechanical Engineer",
-    "Pharmacist",
-    "Chef",
-    "Journalist",
-    "King of Gondor"
-];
 
 const editPersonalInfo = async (req, res) => {
     // Extract the user ID from the token
@@ -62,16 +45,19 @@ const editPersonalInfo = async (req, res) => {
         }
 
         // Password validation
-        if (password) {
-            if (!/^(?=.*[A-Za-z0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,20}$/.test(password)) {
-                return res.status(400).json({
-                    message:
-                        'Password must be 6 to 20 characters long, alphanumeric, and contain at least one special character',
-                });
-            }
-            const salt = await bcrypt.genSalt(10);
-            password = await bcrypt.hash(password, salt);
+        if (password === undefined || password === null || password === '') {
+            return res.status(400).json({
+                message: 'Password is required',
+            });
         }
+
+        if (!/^(?=.*[A-Za-z0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,20}$/.test(password)) {
+            return res.status(400).json({
+                message: 'Password must be 6 to 20 characters long, alphanumeric, and contain at least one special character',
+            });
+        }
+        const salt = await bcrypt.genSalt(10);
+        password = await bcrypt.hash(password, salt);
 
 
         if (username && username !== user.username) {

@@ -2,28 +2,8 @@ const User = require('../models/userModel')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const validator = require('validator')
+const {validFieldOptions} = require('../staticData/fields')
 
-//predefined professions as an array of strings
-//we could have saved them in another collection in mongo as well.
-
-const validFieldOptions = [
-    "Software Engineer",
-    "Web Developer",
-    "Data Scientist",
-    "Graphic Designer",
-    "Nurse",
-    "Accountant",
-    "Marketing Manager",
-    "Architect",
-    "Teacher",
-    "Lawyer",
-    "Electrician",
-    "Mechanical Engineer",
-    "Pharmacist",
-    "Chef",
-    "Journalist",
-    "King of Gondor"
-];
 
 const signUpUser = async(req, res) => {
 
@@ -62,14 +42,18 @@ const signUpUser = async(req, res) => {
             }
         }
 
+        if (password === undefined || password === null || password === '') {
+            return res.status(400).json({
+                message: 'Password is required',
+            });
+        }
+
         // Password validation
         if (!/^(?=.*[A-Za-z0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,20}$/.test(password)) {
             return res.status(400).json({
                 message: 'Password must be 6 to 20 characters long, alphanumeric, and contain at least one special character',
             });
         }
-
-
 
 
         if (!validFieldOptions.includes(field)) {
