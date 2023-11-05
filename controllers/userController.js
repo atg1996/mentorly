@@ -31,7 +31,7 @@ const getUsersWithPagination = async (req, res) => {
         const startIndex = (page - 1) * limit;
 
 
-        const query = User.find(filters).select('name surname position registrationDate');
+        const query = User.find(filters).select('_id name surname position registrationDate');
 
         if (!Object.keys(filters).length) {
             query.skip(startIndex).limit(limit);
@@ -55,7 +55,29 @@ const getUsersWithPagination = async (req, res) => {
     }
 };
 
+const viewUserProfile = async (req, res) => {
+    const userId = req.params.userId;
+
+
+    try {
+
+        const user = await User.findById(userId).select('-password'); // Exclude the password field from the response
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+
+        res.status(200).json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
 module.exports = {
     getUsersWithPagination,
+    viewUserProfile
 };
 

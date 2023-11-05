@@ -4,9 +4,7 @@ const controller = require('../controllers/userController')
 const {tokenCheck} = require('../middlewares/auth')
 
 
-router.get('/user/:id', (req, res) => {
-
-});
+router.get('/user/:userId',tokenCheck, controller.viewUserProfile);
 
 
 router.get('/',tokenCheck, controller.getUsersWithPagination);

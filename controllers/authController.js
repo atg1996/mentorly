@@ -3,9 +3,31 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const validator = require('validator')
 
+//predefined professions as an array of strings
+//we could have saved them in another collection in mongo as well.
+
+const validFieldOptions = [
+    "Software Engineer",
+    "Web Developer",
+    "Data Scientist",
+    "Graphic Designer",
+    "Nurse",
+    "Accountant",
+    "Marketing Manager",
+    "Architect",
+    "Teacher",
+    "Lawyer",
+    "Electrician",
+    "Mechanical Engineer",
+    "Pharmacist",
+    "Chef",
+    "Journalist",
+    "King of Gondor"
+];
+
 const signUpUser = async(req, res) => {
 
-    const { login,
+    const { username,
         password,
         email,
         name,
@@ -22,17 +44,45 @@ const signUpUser = async(req, res) => {
 
     try {
 
+        if (username) {
+            const existingUser = await User.findOne({ username });
+            if (existingUser) {
+                return res.status(409).json({ message: 'Username is already in use' });
+            }
+        }
+
         if (!validator.isEmail(email)) {
             return res.status(400).json({ message: 'Invalid email format' });
         }
 
+        if (email) {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(409).json({ message: 'Email is already in use' });
+            }
+        }
 
-        const existingUser = await User.findOne({ $or: [{ login }, { email }] });
+        // Password validation
+        if (!/^(?=.*[A-Za-z0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{6,20}$/.test(password)) {
+            return res.status(400).json({
+                message: 'Password must be 6 to 20 characters long, alphanumeric, and contain at least one special character',
+            });
+        }
+
+
+
+
+        if (!validFieldOptions.includes(field)) {
+            return res.status(400).json({ message: 'Invalid field value' });
+        }
+
+
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             return res.status(409).json({ message: 'User already exists' });
         }
 
-        const newUser = new User({ login,
+        const newUser = new User({ username,
             password, name, surname, isMentor,
             position, field, description, email,
             education, experience, about });
@@ -50,10 +100,10 @@ const signUpUser = async(req, res) => {
 
 const loginUser = async(req,res) => {
 
-    const { login, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-        const user = await User.findOne({ login });
+        const user = await User.findOne({ username });
         if (!user) {
             return res.status(401).json({ message: 'Authentication failed' });
         }
@@ -63,7 +113,7 @@ const loginUser = async(req,res) => {
             return res.status(401).json({ message: 'Authentication failed' });
         }
 
-        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
         res.status(200).json({ message: 'Authentication successful', token });
     } catch (error) {

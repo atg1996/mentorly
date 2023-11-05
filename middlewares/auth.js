@@ -11,8 +11,9 @@ function tokenCheck(req, res, next) {
         if (error) {
             return res.status(401).json({ message: 'Invalid token' });
         }
+
         req.userId = decodedToken.userId;
-        req.userRole = decodedToken.role;
+        req.username = decodedToken.username;
         next();
     });
 }

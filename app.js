@@ -3,7 +3,7 @@ require('dotenv').config();
 //application
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;;
+const port = process.env.PORT || 3000;
 
 //router
 const authenticationRouter = require('./routers/authRouter');
@@ -32,7 +32,7 @@ app.use('/api/v1/users', userListRouter);
 
 
 app.get('/', (req, res) => {
-    res.send('this route returns 200');
+    res.send('this route is for testing');
 });
 
 

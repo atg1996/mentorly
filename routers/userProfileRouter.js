@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const controller = require('../controllers/profileController')
+const {tokenCheck} = require('../middlewares/auth')
 
 
-router.put('/user/:id', (req, res) => {
-
-});
+router.patch('/edit', tokenCheck, controller.editPersonalInfo );
 
 module.exports = router;
